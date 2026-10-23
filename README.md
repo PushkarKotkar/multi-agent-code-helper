@@ -162,3 +162,65 @@ Additionally, during unit testing of document chunking, single-line text without
 ### Solution:
 1. **ADK McpToolset Packaging:** Google ADK's `LlmAgent` validator expects the `tools` parameter to be an iterable sequence of tools and toolsets. We resolved the initialization failure by wrapping `McpToolset` inside a list: `filesystem_tools = [McpToolset(...)]`.
 2. **Word-Boundary Chunker Fallback:** In `code_helper/index_codebase.py`, we enhanced `chunk_document` with a secondary search for space boundaries (`" "`) if no newline character (`"\n"`) is found within the chunk window. This guarantees words and identifiers remain intact across chunk boundaries, resolving the test failure and ensuring 100% test pass rates across the suite.
+
+
+
+
+
+# How to run this project
+
+Steps to Run the Project
+Step 1: Install Dependencies
+Open PowerShell in the project root directory and run:
+
+powershell
+pip install -r requirements.txt
+(Or run .\setup_windows.cmd if you prefer an automated virtual environment setup).
+
+Step 2: Verify Configuration in .env
+Ensure your 
+
+.env
+ file is populated with valid keys and paths:
+
+ini
+NVIDIA_API_KEY=your_nvidia_api_key
+NVIDIA_NIM_API_KEY=your_nvidia_api_key
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX_NAME=code-helper
+CODEBASE_PATH=C:/Users/tejas/OneDrive/Desktop/data/Naive_RAG
+CHUNK_SIZE=700
+CHUNK_OVERLAP=120
+TOP_K=4
+NOTE
+
+Make sure CODEBASE_PATH points to the target repository you want the agents to analyze and index.
+
+Step 3: Run the Verification Tests
+Run the test suite to confirm tools, configuration, and agent initialization are working properly:
+
+powershell
+python -m pytest tests/
+(All 9 tests have been verified passing).
+
+Step 4: Index the Target Codebase
+Generate embeddings and populate your Pinecone vector index with the target codebase:
+
+powershell
+python -m code_helper.index_codebase
+Step 5: Start the Multi-Agent System
+You can interact with the system via the Web UI or through the terminal:
+
+Option A: Web Browser UI (Recommended)
+
+powershell
+$env:PATH += ";$env:APPDATA\Python\Python314\Scripts"
+adk web code_helper
+Open http://127.0.0.1:8000 in your browser to chat with the coordinator.
+
+Option B: Terminal Interactive Mode
+
+powershell
+$env:PATH += ";$env:APPDATA\Python\Python314\Scripts"
+adk run code_helper
+11:46 AM
